@@ -1,0 +1,182 @@
+[
+ {
+  "plannedDepartureTime": 1793811240000,
+  "realtime": true,
+  "delayInMinutes": 43,
+  "realtimeDepartureTime": 1793813820000,
+  "transportType": "SBAHN",
+  "label": "S3",
+  "divaId": "920S3",
+  "network": "ddb",
+  "trainType": "",
+  "destination": "Mammendorf",
+  "cancelled": false,
+  "sev": false,
+  "platform": 2,
+  "platformChanged": false,
+  "messages": [],
+  "infos": [
+   {
+    "message": "Polizeieinsatz",
+    "type": "INCIDENT",
+    "network": "ddb"
+   }
+  ],
+  "bannerHash": "",
+  "occupancy": "UNKNOWN",
+  "stationGlobalId": "de:09162:2",
+  "stopPointGlobalId": "",
+  "lineId": "ddb:920S3:A:R:j26",
+  "tripCode": 623
+ },
+ {
+  "plannedDepartureTime": 1793812140000,
+  "realtime": true,
+  "delayInMinutes": 31,
+  "realtimeDepartureTime": 1793814000000,
+  "transportType": "SBAHN",
+  "label": "S5",
+  "divaId": "920S5",
+  "network": "ddb",
+  "trainType": "",
+  "destination": "Germering, Germering-Unterpfaffenhofen",
+  "cancelled": false,
+  "sev": false,
+  "platform": 2,
+  "platformChanged": false,
+  "messages": [],
+  "infos": [
+   {
+    "message": "Polizeieinsatz",
+    "type": "INCIDENT",
+    "network": "ddb"
+   }
+  ],
+  "bannerHash": "",
+  "occupancy": "UNKNOWN",
+  "stationGlobalId": "de:09162:2",
+  "stopPointGlobalId": "",
+  "lineId": "ddb:920S5:A:R:j26",
+  "tripCode": 638
+ },
+ {
+  "plannedDepartureTime": 1793811600000,
+  "realtime": true,
+  "delayInMinutes": 41,
+  "realtimeDepartureTime": 1793814060000,
+  "transportType": "SBAHN",
+  "label": "S8",
+  "divaId": "920S8",
+  "network": "ddb",
+  "trainType": "",
+  "destination": "Herrsching",
+  "cancelled": false,
+  "sev": false,
+  "platform": 2,
+  "platformChanged": false,
+  "messages": [],
+  "infos": [
+   {
+    "message": "Polizeieinsatz",
+    "type": "INCIDENT",
+    "network": "ddb"
+   }
+  ],
+  "bannerHash": "",
+  "occupancy": "UNKNOWN",
+  "stationGlobalId": "de:09162:2",
+  "stopPointGlobalId": "",
+  "lineId": "ddb:920S8: :R:j26",
+  "tripCode": 1545
+ },
+ {
+  "plannedDepartureTime": 1793812440000,
+  "realtime": true,
+  "delayInMinutes": 29,
+  "realtimeDepartureTime": 1793814180000,
+  "transportType": "SBAHN",
+  "label": "S3",
+  "divaId": "920S3",
+  "network": "ddb",
+  "trainType": "",
+  "destination": "Mammendorf",
+  "cancelled": false,
+  "sev": false,
+  "platform": 2,
+  "platformChanged": false,
+  "messages": [],
+  "infos": [
+   {
+    "message": "Polizeieinsatz",
+    "type": "INCIDENT",
+    "network": "ddb"
+   }
+  ],
+  "bannerHash": "",
+  "occupancy": "UNKNOWN",
+  "stationGlobalId": "de:09162:2",
+  "stopPointGlobalId": "",
+  "lineId": "ddb:920S3:A:R:j26",
+  "tripCode": 626
+ },
+ {
+  "plannedDepartureTime": 1793813340000,
+  "realtime": true,
+  "delayInMinutes": 17,
+  "realtimeDepartureTime": 1793814360000,
+  "transportType": "SBAHN",
+  "label": "S5",
+  "divaId": "920S5",
+  "network": "ddb",
+  "trainType": "",
+  "destination": "Germering, Germering-Unterpfaffenhofen",
+  "cancelled": false,
+  "sev": false,
+  "platform": 2,
+  "platformChanged": false,
+  "messages": [],
+  "infos": [
+   {
+    "message": "Polizeieinsatz",
+    "type": "INCIDENT",
+    "network": "ddb"
+   }
+  ],
+  "bannerHash": "",
+  "occupancy": "UNKNOWN",
+  "stationGlobalId": "de:09162:2",
+  "stopPointGlobalId": "",
+  "lineId": "ddb:920S5:A:R:j26",
+  "tripCode": 644
+ },
+ {
+  "plannedDepartureTime": 1793812800000,
+  "realtime": true,
+  "delayInMinutes": 32,
+  "realtimeDepartureTime": 1793814720000,
+  "transportType": "SBAHN",
+  "label": "S8",
+  "divaId": "920S8",
+  "network": "ddb",
+  "trainType": "",
+  "destination": "Herrsching",
+  "cancelled": false,
+  "sev": false,
+  "platform": 2,
+  "platformChanged": false,
+  "messages": [],
+  "infos": [
+   {
+    "message": "Polizeieinsatz",
+    "type": "INCIDENT",
+    "network": "ddb"
+   }
+  ],
+  "bannerHash": "",
+  "occupancy": "UNKNOWN",
+  "stationGlobalId": "de:09162:2",
+  "stopPointGlobalId": "",
+  "lineId": "ddb:920S8: :R:j26",
+  "tripCode": 1549
+ }
+]

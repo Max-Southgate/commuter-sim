@@ -1,0 +1,37 @@
+# Copy this file to config/routes.yaml (gitignored) and put in your real locations.
+# Everything in commuter-sim is driven from this file - nothing about Munich is hard-coded.
+
+timezone: Europe/Berlin
+
+routes:
+  my_commute:
+    name: "Home -> Work"
+    home: { lat: 48.1351, lon: 11.5820, label: "Home (example: Altstadt)" }
+    work: { lat: 48.1770, lon: 11.5560, label: "Work (example: Schwabing-West)" }
+    # MVG station globalIds on your transit route (2-4 is plenty). Find them with:
+    #   python -m app.tools.stops nearby --lat 48.1351 --lon 11.5820
+    #   python -m app.tools.stops search "Marienplatz"
+    stops:
+      - de:09162:2   # Marienplatz (example)
+    period: { start: 2027-01-10, end: 2027-03-21 }
+    commute_times: { out: "08:00", back: "17:30" }
+    commute_minutes: 30          # rough door-to-door duration, used to pick weather hours
+    workdays: [mon, tue, wed, thu, fri]
+
+# Thresholds for what counts as an OK cycling commute. These are the defaults the
+# dashboard sliders start from - tune them to your own tolerance.
+cycling_thresholds:
+  min_temp_c: -3          # colder than this (feels-like) = not OK
+  max_precip_mm_h: 0.2    # more precipitation than this in any commute hour = wet
+  max_gust_kmh: 50        # stronger gusts than this = not OK
+  max_snow_depth_cm: 3     # lying snow deeper than this (ERA5 grid, so rural-ish) = not OK
+
+climatology:
+  first_year: 1996
+  last_year: 2026
+
+collector:
+  interval_seconds: 120
+  windows: ["06:00-10:00", "15:00-20:00"]   # local time
+  weekdays_only: true
+  departures_per_poll: 60

@@ -1,0 +1,24 @@
+# local config with real coordinates & secrets
+config/routes.yaml
+.env
+
+# data store and caches
+data/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
