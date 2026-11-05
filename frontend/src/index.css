@@ -1,0 +1,250 @@
+/*
+  Design language: "Munich transit sign" (see design_language.md and DESIGN_NOTES.md).
+  - Vernacular: MVG station signs and line badges, German DIN-style lettering, bike-lane green.
+  - The one bold element: the route sign + the 31-winter grid. Everything else stays quiet.
+  - No card kit: sections sit on the page; only the interactive limits get a panel.
+  - Radii encode role: sign 3px, controls panel 6px, line badge 2px, heatmap cells 2px.
+*/
+@import "@fontsource/barlow-semi-condensed/400.css";
+@import "@fontsource/barlow-semi-condensed/500.css";
+@import "@fontsource/barlow-semi-condensed/600.css";
+@import "@fontsource-variable/source-serif-4/opsz.css";
+
+:root {
+  color-scheme: light;
+  /* base palette */
+  --frost: #edf2f5;      /* page */
+  --snow: #ffffff;       /* the one panel (limits) */
+  --mvg-navy: #13294b;   /* ink + the sign */
+  --u2-red: #c4122f;     /* transit line */
+  --slate: #44566b;      /* secondary text */
+  --radweg: #1a5a36;     /* bike / rideable */
+
+  /* roles */
+  --page: var(--frost);
+  --panel: var(--snow);
+  --ink: var(--mvg-navy);
+  --ink-2: var(--slate);
+  --muted: #677a8c;      /* axis labels only (3.9:1) */
+  --rule: #d3dde4;
+  --axis: #a9b7c2;
+  --sign-bg: var(--mvg-navy);
+  --sign-ink: #ffffff;
+  --line: var(--u2-red);
+  --warn: #b8601a;
+  --focus: #2d6cb5;
+
+  /* charts (validated: categorical + ordinal, on --page) */
+  --series-out: #2d6cb5;   /* mornings: Isar blue */
+  --series-back: #b8601a;  /* evenings: dusk amber */
+  --seq-0: #c3ced8;        /* 0 rides: neutral, recedes; 1 / 2 rides: bike-lane green */
+  --seq-1: #5fa77a;
+  --seq-2: #1a5a36;
+  --wash-neutral: rgba(19, 41, 75, 0.09);
+  --surface-1: var(--page); /* ring colour around chart markers */
+
+  /* type */
+  --sans: "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
+  --serif: "Source Serif 4 Variable", Georgia, serif;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  /* "Tunnel": the U-Bahn at night, navy rather than black */
+  --page: #0f1c2e;
+  --panel: #16263b;
+  --ink: #e6eef4;
+  --ink-2: #afc0ce;
+  --muted: #8296a8;
+  --rule: #22354c;
+  --axis: #2f4560;
+  --sign-bg: #1d3a63;
+  --sign-ink: #ffffff;
+  --line: #d42a44;
+  --warn: #cf7a2e;
+  --focus: #6aa5e8;
+  --series-out: #4a8ad6;
+  --series-back: #cf7a2e;
+  --seq-0: #33475f;
+  --seq-1: #3f9a63;
+  --seq-2: #a3d9b6;
+  --wash-neutral: rgba(175, 192, 206, 0.10);
+}
+
+/* ---------- base ---------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.4;
+  font-variant-numeric: lining-nums;
+}
+main { max-width: 1080px; margin: 0 auto; padding: 28px 24px 80px; }
+@media (min-width: 1500px) { main { max-width: 1240px; } }
+@media (min-width: 2200px) { main { max-width: 1560px; } body { font-size: 17px; } }
+
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+code { font-family: inherit; font-weight: 600; }
+
+/* Type scale (classic: 12 / 14 / 16 / 21 / 24 / 36 / 48) */
+h2 {
+  font-family: var(--sans); font-weight: 600; font-size: 24px; line-height: 1.15;
+  letter-spacing: 0.005em; margin: 0 0 6px;
+}
+.prose, .sub {
+  font-family: var(--serif);
+  font-size: 16px; line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 36em;           /* < 80 characters per line */
+  margin: 0 0 14px;
+}
+.muted { color: var(--muted); }
+
+/* ---------- the route sign (the bold moment) ---------- */
+.sign {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px 22px;
+  background: var(--sign-bg);
+  color: var(--sign-ink);
+  border-radius: 3px;
+  padding: 18px 22px;
+}
+.station { font-weight: 600; font-size: 36px; line-height: 1; letter-spacing: 0.005em; white-space: nowrap; }
+.track { position: relative; height: 6px; background: var(--line); border-radius: 3px; min-width: 40px; }
+.badge {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  background: var(--line); color: #fff; font-weight: 600; font-size: 21px; line-height: 1;
+  padding: 5px 10px 4px; border-radius: 2px; border: 3px solid var(--sign-bg);
+}
+.route { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; min-width: 0; }
+.theme {
+  justify-self: end; margin-left: 10px;
+  display: inline-flex; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 3px; padding: 2px;
+}
+.theme button {
+  font: 500 14px var(--sans); color: rgba(255, 255, 255, 0.8); background: transparent;
+  border: 0; border-radius: 2px; padding: 4px 10px; cursor: pointer;
+}
+.theme button[aria-pressed="true"] { background: #fff; color: var(--mvg-navy); }
+
+/* ---------- the answer ---------- */
+.answer {
+  font-family: var(--serif);
+  font-size: 36px; line-height: 1.22; font-weight: 400;
+  font-variation-settings: "opsz" 48;
+  letter-spacing: -0.01em;
+  max-width: 22em;
+  margin: 34px 0 12px;
+  color: var(--ink);
+}
+.answer-detail { font-size: 18px; max-width: 34em; margin-bottom: 8px; }
+.meta { font-size: 14px; color: var(--ink-2); margin: 0 0 26px; max-width: 60em; }
+
+/* ---------- your limits: the only panel, because it's the only thing you operate ---------- */
+.limits {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 14px 18px 16px;
+  margin: 0 0 28px;
+}
+.limits h2 { font-size: 16px; margin-bottom: 10px; }
+.filters {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px 28px; align-items: end;
+}
+.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--ink-2); }
+.filters output { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.filters input[type="range"] { width: 100%; accent-color: var(--u2-red); }
+:root[data-theme="dark"] .filters input[type="range"] { accent-color: var(--line); }
+.filters select {
+  font: 500 15px var(--sans); padding: 5px 8px; border-radius: 3px;
+  border: 1px solid var(--axis); background: var(--panel); color: var(--ink);
+}
+
+/* ---------- sections: spacing does the separating, not boxes ---------- */
+.section { margin-top: 64px; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 64px; }
+.pair > * { min-width: 0; }  /* lets charts measuring these columns shrink */
+.pair .section { margin-top: 0; }
+.notice {
+  font-family: var(--serif); font-size: 15px; line-height: 1.55;
+  border-left: 3px solid var(--warn); padding: 6px 0 6px 14px; margin: 22px 0 0; max-width: 46em;
+}
+.loading { opacity: 0.5; transition: opacity 0.15s; }
+
+/* ---------- charts ---------- */
+svg.chart { display: block; overflow: visible; }
+svg.chart text { fill: var(--muted); font-family: var(--sans); font-size: 12px; }
+svg.chart .label-primary { fill: var(--ink-2); font-size: 14px; }
+.legend { display: flex; gap: 6px 18px; flex-wrap: wrap; font-size: 14px; color: var(--ink-2); margin: 4px 0 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.key-line { width: 18px; height: 2px; border-radius: 1px; display: inline-block; }
+.key-rect { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* heatmap: one orchestrated entrance (winters arrive in order), colour eases on slider changes */
+.cells rect { transition: fill 0.35s ease; }
+.cells g { animation: winter-in 0.5s ease both; }
+@keyframes winter-in { from { opacity: 0; } to { opacity: 1; } }
+
+.tooltip {
+  position: absolute; pointer-events: none; z-index: 5;
+  background: var(--panel); border: 1px solid var(--rule);
+  box-shadow: 0 6px 18px rgba(19, 41, 75, 0.14);
+  border-radius: 3px; padding: 8px 10px; font-size: 14px; min-width: 150px; white-space: nowrap;
+}
+.tooltip .t-title { color: var(--ink-2); margin-bottom: 4px; }
+.tooltip .t-row { display: flex; align-items: center; gap: 8px; }
+.tooltip .t-row strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tooltip .t-row span { color: var(--ink-2); }
+
+details { margin-top: 10px; }
+summary { cursor: pointer; color: var(--ink-2); font-size: 14px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; margin-top: 8px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 5px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th:first-child, td:first-child, th.name, td.name { text-align: left; }
+th { color: var(--ink-2); font-weight: 600; }
+
+/* line badge used inline in tables (e.g. the U2 rows) */
+.chip {
+  display: inline-block; min-width: 30px; text-align: center; font-weight: 600; font-size: 13px;
+  padding: 1px 5px; border-radius: 2px; color: #fff; background: var(--ink-2); margin-right: 6px;
+}
+.chip.ubahn { background: var(--line); }
+.chip.sbahn { background: #2e8b3d; }
+.chip.tram { background: #c0392b; }
+.chip.bus { background: #1f6f8b; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- tablets ---------- */
+@media (max-width: 820px) {
+  .pair { grid-template-columns: 1fr; gap: 56px; }
+  .station { font-size: 28px; }
+  .answer { font-size: 30px; }
+}
+/* ---------- phones ---------- */
+@media (max-width: 560px) {
+  main { padding: 12px 12px 56px; }
+  .sign { grid-template-columns: 1fr; padding: 14px 14px 12px; }
+  .route { gap: 12px; }
+  .theme { justify-self: end; margin-left: 0; }
+  .station { font-size: 24px; }
+  .badge { font-size: 16px; }
+  .answer { font-size: 24px; margin-top: 24px; }
+  .answer-detail { font-size: 16px; }
+  .limits { padding: 12px; }
+  .filters { grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+  .section, .pair { margin-top: 48px; }
+  h2 { font-size: 21px; }
+  .tooltip { white-space: normal; max-width: 220px; }
+}
