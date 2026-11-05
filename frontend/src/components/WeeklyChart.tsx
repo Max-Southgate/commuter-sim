@@ -1,9 +1,8 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { WeekRow } from "../api";
-import { fmtDay, svgPoint } from "../format";
+import { fmtDay } from "../format";
+import { labelStride, useElementWidth } from "../hooks";
 import { TRow, Tooltip } from "./Tooltip";
-
-const W = 470, H = 230, L = 36, R = 80, T = 12, B = 26;
 
 const SERIES = [
   { key: "out_cyclable_pct" as const, name: "Outbound", color: "var(--series-out)" },
@@ -12,29 +11,33 @@ const SERIES = [
 
 /** % of commute legs that were cyclable, week by week through the stay. */
 export function WeeklyChart({ weekly }: { weekly: WeekRow[] }) {
-  const wrap = useRef<HTMLDivElement>(null);
-  const [hover, setHover] = useState<{ i: number; px: number } | null>(null);
+  const [wrap, W] = useElementWidth<HTMLDivElement>(480);
+  const [hover, setHover] = useState<number | null>(null);
+
+  // Layout adapts to the available width.
+  const narrow = W < 420;
+  const L = 36, T = 12, B = 26, R = narrow ? 14 : 92;
+  const H = Math.round(Math.min(280, Math.max(190, W * 0.5)));
   const n = weekly.length;
-  const step = (W - L - R) / Math.max(1, n - 1);
+  const plotW = W - L - R;
+  const step = plotW / Math.max(1, n - 1);
   const x = (i: number) => L + i * step;
   const y = (v: number) => T + ((100 - v) / 100) * (H - T - B);
   const path = (k: (typeof SERIES)[number]["key"]) =>
     weekly.map((w, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(w[k]).toFixed(1)}`).join(" ");
+  const stride = labelStride(n, plotW, 52);
 
   const last = weekly[n - 1];
-  const endLabels = last && Math.abs(last.out_cyclable_pct - last.back_cyclable_pct) >= 8;
+  const endLabels = !narrow && last && Math.abs(last.out_cyclable_pct - last.back_cyclable_pct) >= 8;
 
   function onMove(e: React.PointerEvent<SVGRectElement>) {
-    const p = svgPoint(e, W, H);
-    const i = Math.max(0, Math.min(n - 1, Math.round((p.x - L) / step)));
-    setHover({ i, px: x(i) * p.scale });
+    const px = e.clientX - e.currentTarget.ownerSVGElement!.getBoundingClientRect().left;
+    setHover(Math.max(0, Math.min(n - 1, Math.round((px - L) / step))));
   }
   function onKey(e: React.KeyboardEvent) {
-    if (!wrap.current) return;
-    const scale = wrap.current.clientWidth / W;
-    const cur = hover?.i ?? -1;
+    const cur = hover ?? -1;
     const i = e.key === "ArrowRight" ? Math.min(n - 1, cur + 1) : e.key === "ArrowLeft" ? Math.max(0, cur - 1) : null;
-    if (i !== null) { setHover({ i, px: x(i) * scale }); e.preventDefault(); }
+    if (i !== null) { setHover(i); e.preventDefault(); }
   }
 
   return (
@@ -42,7 +45,7 @@ export function WeeklyChart({ weekly }: { weekly: WeekRow[] }) {
       <div className="legend">
         {SERIES.map((s) => <span key={s.key}><i className="key-line" style={{ background: s.color }} />{s.name}</span>)}
       </div>
-      <svg className="chart" viewBox={`0 0 ${W} ${H}`} tabIndex={0} onKeyDown={onKey} onBlur={() => setHover(null)}
+      <svg className="chart" width={W} height={H} tabIndex={0} onKeyDown={onKey} onBlur={() => setHover(null)}
            aria-label="Share of cyclable commute legs per week, outbound and return">
         {[0, 25, 50, 75, 100].map((v) => (
           <g key={v}>
@@ -50,7 +53,7 @@ export function WeeklyChart({ weekly }: { weekly: WeekRow[] }) {
             <text x={L - 6} y={y(v) + 4} textAnchor="end">{v}%</text>
           </g>
         ))}
-        {weekly.map((w, i) => i % 2 === 0 && (
+        {weekly.map((w, i) => i % stride === 0 && (
           <text key={w.week} x={x(i)} y={H - 6} textAnchor="middle">{fmtDay(w.week_start)}</text>
         ))}
         {SERIES.map((s) => (
@@ -67,41 +70,44 @@ export function WeeklyChart({ weekly }: { weekly: WeekRow[] }) {
             )}
           </g>
         ))}
-        {hover && (
+        {hover !== null && (
           <g pointerEvents="none">
-            <line x1={x(hover.i)} x2={x(hover.i)} y1={T} y2={H - B} stroke="var(--axis)" />
+            <line x1={x(hover)} x2={x(hover)} y1={T} y2={H - B} stroke="var(--axis)" />
             {SERIES.map((s) => (
-              <circle key={s.key} cx={x(hover.i)} cy={y(weekly[hover.i][s.key])} r={4}
+              <circle key={s.key} cx={x(hover)} cy={y(weekly[hover][s.key])} r={4}
                       fill={s.color} stroke="var(--surface-1)" strokeWidth={2} />
             ))}
           </g>
         )}
-        <rect x={L - step / 2} y={T} width={W - L - R + step} height={H - T - B} fill="transparent"
-              onPointerMove={onMove} onPointerLeave={() => setHover(null)} />
+        <rect x={L - step / 2} y={T} width={plotW + step} height={H - T - B} fill="transparent"
+              style={{ touchAction: "pan-y" }}
+              onPointerMove={onMove} onPointerDown={onMove} onPointerLeave={() => setHover(null)} />
       </svg>
-      {hover && wrap.current && (
-        <Tooltip x={hover.px} y={40} containerWidth={wrap.current.clientWidth}>
-          <div className="t-title">Week of {fmtDay(weekly[hover.i].week_start)}</div>
+      {hover !== null && (
+        <Tooltip x={x(hover)} y={40} containerWidth={W}>
+          <div className="t-title">Week of {fmtDay(weekly[hover].week_start)}</div>
           {SERIES.map((s) => (
-            <TRow key={s.key} color={s.color} value={`${weekly[hover.i][s.key].toFixed(0)}%`} label={`${s.name} cyclable`} />
+            <TRow key={s.key} color={s.color} value={`${weekly[hover][s.key].toFixed(0)}%`} label={`${s.name} cyclable`} />
           ))}
-          <TRow value={`${weekly[hover.i].out_median_feels_c.toFixed(1)} °C`} label="median feels-like, outbound" />
-          <TRow value={`${weekly[hover.i].back_dark_pct.toFixed(0)}%`} label="return in the dark" />
+          <TRow value={`${weekly[hover].out_median_feels_c.toFixed(1)} °C`} label="median feels-like, outbound" />
+          <TRow value={`${weekly[hover].back_dark_pct.toFixed(0)}%`} label="return in the dark" />
         </Tooltip>
       )}
       <details>
         <summary>Table view</summary>
-        <table>
-          <thead><tr><th>Week of</th><th>Outbound OK</th><th>Return OK</th><th>Wet/snowing</th><th>Feels-like out</th><th>Return dark</th></tr></thead>
-          <tbody>
-            {weekly.map((w) => (
-              <tr key={w.week}>
-                <td>{fmtDay(w.week_start)}</td><td>{w.out_cyclable_pct}%</td><td>{w.back_cyclable_pct}%</td>
-                <td>{w.wet_pct}%</td><td>{w.out_median_feels_c} °C</td><td>{w.back_dark_pct}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="table-scroll">
+          <table>
+            <thead><tr><th>Week of</th><th>Outbound OK</th><th>Return OK</th><th>Wet/snowing</th><th>Feels-like out</th><th>Return dark</th></tr></thead>
+            <tbody>
+              {weekly.map((w) => (
+                <tr key={w.week}>
+                  <td>{fmtDay(w.week_start)}</td><td>{w.out_cyclable_pct}%</td><td>{w.back_cyclable_pct}%</td>
+                  <td>{w.wet_pct}%</td><td>{w.out_median_feels_c} °C</td><td>{w.back_dark_pct}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </details>
     </div>
   );

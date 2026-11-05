@@ -22,3 +22,7 @@ frontend/dist/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Markdowns or AI Skills
+design_language.md
+DESIGN_NOTES.md

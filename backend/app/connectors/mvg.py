@@ -17,7 +17,7 @@ import json
 import httpx
 import pandas as pd
 
-from app.connectors.base import get_json, make_client
+from app.connectors.base import JsonCache, get_json, make_client
 
 BASE = "https://www.mvg.de/api/bgw-pt/v3"
 
@@ -63,15 +63,17 @@ def parse_departures(payload: list[dict], station_id: str) -> pd.DataFrame:
 
 
 class MVG:
-    def __init__(self, client: httpx.Client | None = None):
+    def __init__(self, client: httpx.Client | None = None, cache: JsonCache | None = None):
+        """`cache` is only used for station lookups (stable); departures are always live."""
         self.client = client or make_client(timeout=15.0)
+        self.cache = cache
 
     def departures(self, station_id: str, limit: int = 60) -> pd.DataFrame:
         payload = get_json(self.client, f"{BASE}/departures", {"globalId": station_id, "limit": limit})
         return parse_departures(payload, station_id)
 
     def search_stations(self, query: str) -> list[dict]:
-        return get_json(self.client, f"{BASE}/locations", {"query": query, "locationTypes": "STATION"})
+        return get_json(self.client, f"{BASE}/locations", {"query": query, "locationTypes": "STATION"}, self.cache)
 
     def nearby_stations(self, lat: float, lon: float) -> list[dict]:
-        return get_json(self.client, f"{BASE}/stations/nearby", {"latitude": lat, "longitude": lon})
+        return get_json(self.client, f"{BASE}/stations/nearby", {"latitude": lat, "longitude": lon}, self.cache)

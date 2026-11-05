@@ -22,7 +22,11 @@ export interface WeekRow {
 }
 
 export interface Climatology {
-  route: { id: string; name: string; out_time: string; back_time: string; commute_minutes: number };
+  route: {
+    id: string; name: string; line: string | null;
+    home: { lat: number; lon: number; label: string }; work: { lat: number; lon: number; label: string };
+    out_time: string; back_time: string; commute_minutes: number;
+  };
   period: { start: string; end: string; commute_days: number };
   thresholds: Thresholds;
   using_example_config: boolean;
@@ -51,7 +55,7 @@ export interface CollectorStatus {
 }
 
 export interface DelayLine {
-  station_id: string; label: string; transport_type: string; departures: number;
+  station_id: string; station_name: string | null; label: string; transport_type: string; departures: number;
   cancelled_pct: number; replacement_bus_pct: number;
   delay_p50: number | null; delay_p90: number | null; late_5min_pct: number;
 }

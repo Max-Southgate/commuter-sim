@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, HTTPException
 
 from app import store
-from app.config import get_settings
+from app.config import Route, get_settings
+from app.connectors.base import JsonCache
+from app.connectors.mvg import MVG
+
+log = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/transit", tags=["transit"])
 
@@ -55,4 +61,21 @@ def delay_summary(route: str | None = None):
         ORDER BY departures DESC
     """, list(r.stops))
     lines = [] if df.empty else df.round(1).astype(object).where(df.notna(), None).to_dict("records")
+    names = station_names(r)
+    for line in lines:
+        line["station_name"] = names.get(line["station_id"])
     return {"lines": lines}
+
+
+def station_names(r: Route) -> dict[str, str]:
+    """Names for the route's stops. MVG has no lookup by id, but its 'nearby' search around home and
+    work returns the stops with names. Responses are cached on disk, so this hits MVG once per route."""
+    mvg = MVG(cache=JsonCache("mvg_stations"))
+    names: dict[str, str] = {}
+    for p in (r.home, r.work):
+        try:
+            for st in mvg.nearby_stations(p.lat, p.lon):
+                names.setdefault(st["globalId"], st["name"])
+        except Exception as e:  # names are a nicety; never break the delay table over them
+            log.warning("station name lookup failed: %s", e)
+    return {sid: names[sid] for sid in r.stops if sid in names}

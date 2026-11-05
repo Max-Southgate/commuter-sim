@@ -29,12 +29,11 @@ export function fmtMinutes(min: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-/** Map a pointer event to SVG viewBox x/y (the SVG scales with width:100%). */
-export function svgPoint(e: React.PointerEvent<SVGElement>, viewW: number, viewH: number) {
-  const rect = (e.currentTarget.ownerSVGElement ?? (e.currentTarget as SVGSVGElement)).getBoundingClientRect();
-  return {
-    x: ((e.clientX - rect.left) / rect.width) * viewW,
-    y: ((e.clientY - rect.top) / rect.height) * viewH,
-    scale: rect.width / viewW,
-  };
+const LONG_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
+  "September", "October", "November", "December"];
+
+/** "10 January" */
+export function fmtLongDay(iso: string): string {
+  const d = parseDate(iso);
+  return `${d.getUTCDate()} ${LONG_MONTHS[d.getUTCMonth()]}`;
 }

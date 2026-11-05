@@ -6,8 +6,10 @@ timezone: Europe/Berlin
 routes:
   my_commute:
     name: "Home -> Work"
-    home: { lat: 48.1351, lon: 11.5820, label: "Home (example: Altstadt)" }
-    work: { lat: 48.1770, lon: 11.5560, label: "Work (example: Schwabing-West)" }
+    # labels are shown on the route sign at the top of the dashboard, so keep them short
+    home: { lat: 48.1351, lon: 11.5820, label: "Altstadt" }
+    work: { lat: 48.1770, lon: 11.5560, label: "Schwabing-West" }
+    line: U6                     # main transit line, shown on the sign (optional)
     # MVG station globalIds on your transit route (2-4 is plenty). Find them with:
     #   python -m app.tools.stops nearby --lat 48.1351 --lon 11.5820
     #   python -m app.tools.stops search "Marienplatz"

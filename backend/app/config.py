@@ -42,6 +42,7 @@ class Route:
     back_time: dt.time
     commute_minutes: int
     workdays: tuple[int, ...]  # 0 = Monday
+    line: str | None = None    # main transit line, e.g. "U2" (shown on the route sign)
 
     @property
     def midpoint(self) -> Point:
@@ -119,6 +120,7 @@ def parse_settings(raw: dict, source_file: Path) -> Settings:
             back_time=_time(r["commute_times"]["back"]),
             commute_minutes=int(r.get("commute_minutes", 30)),
             workdays=tuple(WEEKDAYS.index(w.lower()[:3]) for w in r.get("workdays", WEEKDAYS[:5])),
+            line=str(r["line"]) if r.get("line") else None,
         )
     if not routes:
         raise ValueError(f"No routes defined in {source_file}")

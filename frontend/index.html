@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>commuter-sim</title>
+    <script>
+      // Apply the theme before first paint (no flash). Light is the default.
+      // ?theme=dark|light in the URL overrides and is remembered.
+      (function () {
+        var q = new URLSearchParams(location.search).get("theme");
+        if (q === "dark" || q === "light") localStorage.setItem("theme", q);
+        document.documentElement.dataset.theme = localStorage.getItem("theme") === "dark" ? "dark" : "light";
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

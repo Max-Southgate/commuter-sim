@@ -138,7 +138,8 @@ def summarize(legs: pd.DataFrame, route: Route, settings: Settings, th: CyclingT
     commute_days = route.commute_days()
     n_commute = len(commute_days)
     base = {
-        "route": {"id": route.id, "name": route.name, "home": asdict(route.home), "work": asdict(route.work),
+        "route": {"id": route.id, "name": route.name, "line": route.line,
+                  "home": asdict(route.home), "work": asdict(route.work),
                   "out_time": route.out_time.strftime("%H:%M"), "back_time": route.back_time.strftime("%H:%M"),
                   "commute_minutes": route.commute_minutes},
         "period": {"start": route.period_start.isoformat(), "end": route.period_end.isoformat(),
